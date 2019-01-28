@@ -7,3 +7,12 @@
 [submodule "yumi-1"]
 	path = yumi-1
 	url = git@github.com:epfl-lasa/yumi-1.git
+[submodule "robot-toolkit"]
+	path = robot-toolkit
+	url = git@github.com:epfl-lasa/robot-toolkit.git
+[submodule "robot-kinematics"]
+	path = robot-kinematics
+	url = git@github.com:epfl-lasa/robot-kinematics.git
+[submodule "motion-generators"]
+	path = motion-generators
+	url = git@github.com:epfl-lasa/motion-generators.git
