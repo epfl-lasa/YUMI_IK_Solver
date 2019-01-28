@@ -1,6 +1,0 @@
-lib/*
-bin/*
-*.tar.bz2*
-ode-0.13/*
-include/ode
-build/*

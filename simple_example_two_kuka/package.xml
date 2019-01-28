@@ -67,9 +67,6 @@
 
   <build_depend>hand_commands</build_depend>
     <run_depend>hand_commands</run_depend>
-
-  <build_depend>motion_generators</build_depend>
-    <run_depend>motion_generators</run_depend>
     
   <build_depend>kuka_fri_bridge</build_depend>
     <run_depend>kuka_fri_bridge</run_depend>

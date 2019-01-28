@@ -1,21 +1,3 @@
-[submodule "ABB_needed_packages/abb"]
-	path = abb
-	url = git@github.com:epfl-lasa/abb.git
-[submodule "ABB_needed_packages/industrial_core"]
-	path = industrial_core
-	url = git@github.com:epfl-lasa/industrial_core.git
-[submodule "ABB_needed_packages/yumi-1"]
-	path = yumi-1
-	url = git@github.com:epfl-lasa/yumi-1.git
-[submodule "miscellaneous/robot-toolkit"]
-	path = robot-toolkit
-	url = git@github.com:epfl-lasa/robot-toolkit.git
-[submodule "miscellaneous/robot-kinematics"]
-	path = robot-kinematics
-	url = git@github.com:epfl-lasa/robot-kinematics.git
-[submodule "miscellaneous/motion-generators"]
-	path = motion-generators
-	url = git@github.com:epfl-lasa/motion-generators.git
 [submodule "miscellaneous/mocap_optitrack"]
 	path = miscellaneous/mocap_optitrack
 	url = git@github.com:epfl-lasa/mocap_optitrack.git
@@ -28,3 +10,18 @@
 [submodule "IK_solver/SVMGrad"]
 	path = IK_solver/SVMGrad
 	url = git@github.com:nbfigueroa/SVMGrad.git
+[submodule "miscellaneous/robot-kinematics"]
+	path = miscellaneous/robot-kinematics
+	url = git@github.com:epfl-lasa/robot-kinematics.git
+[submodule "miscellaneous/robot-toolkit"]
+	path = miscellaneous/robot-toolkit
+	url = git@github.com:epfl-lasa/robot-toolkit.git
+[submodule "ABB_needed_packages/industrial_core"]
+	path = ABB_needed_packages/industrial_core
+	url = git@github.com:epfl-lasa/industrial_core.git
+[submodule "ABB_needed_packages/yumi-1"]
+	path = ABB_needed_packages/yumi-1
+	url = git@github.com:epfl-lasa/yumi-1.git
+[submodule "ABB_needed_packages/abb"]
+	path = ABB_needed_packages/abb
+	url = git@github.com:epfl-lasa/abb.git

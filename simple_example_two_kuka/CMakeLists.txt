@@ -12,7 +12,6 @@ find_package(catkin REQUIRED COMPONENTS
   sg_differentiation
   tf
   svm_grad
-  motion_generators
 )
 include(CheckCXXCompilerFlag)
 set(CMAKE_CXX_FLAGS "-std=c++11")
