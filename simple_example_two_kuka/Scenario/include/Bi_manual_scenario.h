@@ -37,14 +37,14 @@ double Gain_velocity_limit=50; //4 on the real robot
 /*SGF::real sample_time = 0.002;*/
 enum ENUM_AXIS{AXIS_X=0, AXIS_Y, AXIS_Z};
 enum ENUM_PLANNER{PLANNER_CARTESIAN=0, PLANNER_JOINT,PLANNER_NONE};
-enum ENUM_COMMAND{COMMAND_INITIAL=0,COMMAND_JOB,COMMAND_Move,COMMAND_STOP,COMMAND_NONE};
+enum ENUM_COMMAND{COMMAND_INITIAL=0,COMMAND_JOB,COMMAND_Move,COMMAND_STOP,COMMAND_Home,COMMAND_NONE};
 
 
 int order = 3;
 int winlen = 5;
 
 const int N_robots=2;
-int dt=0.002;
+const double dt=0.002;
 
 
 using namespace Eigen;
@@ -79,7 +79,7 @@ private :
 	void 						Parameter_initialization();
 	void						initKinematics(int index);
 	void 						initKinematics();
-	void						prepare_sovlve_IK(int index);
+	void						prepare_solver_IK(int index);
 	void 						sendCommand(int _command);
 	void						reset_the_bool();
 	bool						everythingisreceived();
@@ -97,6 +97,8 @@ private :
 	pthread_t					PredictionThread;
 
 	VectorXd					cJob[N_robots];
+	VectorXd					cHome[N_robots];
+	VectorXd					cDesired[N_robots];
 
 	ros::Subscriber				Desired_end_right_sub;
 	ros::Subscriber				Desired_end_left_sub;

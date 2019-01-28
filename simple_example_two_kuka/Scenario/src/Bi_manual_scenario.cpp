@@ -152,6 +152,8 @@ void Bi_manual_scenario::Parameter_initialization()
 		JointDesVel[i].resize(KUKA_DOF);		JointDesVel[i].setZero();
 		//JointPos_mirror[i].resize(KUKA_DOF);	JointPos_mirror[i].setZero();
 		cJob[i].resize(KUKA_DOF);
+		cHome[i].resize(KUKA_DOF);
+		cDesired[i].resize(KUKA_DOF);
 	}
 
 	// Desired Target for the left
@@ -174,9 +176,11 @@ void Bi_manual_scenario::Parameter_initialization()
 
 	cout<<"IK_Solver->Initialize is done"<<endl;
 
-	cJob[1](0)=39.4*PI/180;	cJob[1](1)=-112*PI/180; cJob[0](2)=7.5*PI/180;	cJob[1](3)=48*PI/180;	cJob[1](4)=-43*PI/180;	cJob[1](5)=75*PI/180;	cJob[1](6)=-52*PI/180;
-	cJob[0](0)=-40.0*PI/180;cJob[0](1)=-112*PI/180; cJob[1](2)=-8*PI/180;	cJob[0](3)=48*PI/180;	cJob[0](4)=34*PI/180;	cJob[0](5)=88*PI/180;	cJob[0](6)=73*PI/180;
+	cJob[1](0)=39.4*PI/180;	cJob[1](1)=-112*PI/180; cJob[1](2)=7.5*PI/180;	cJob[1](3)=48*PI/180;	cJob[1](4)=-43*PI/180;	cJob[1](5)=75*PI/180;	cJob[1](6)=-52*PI/180;
+	cJob[0](0)=-40.0*PI/180;cJob[0](1)=-112*PI/180; cJob[0](2)=-8*PI/180;	cJob[0](3)=48*PI/180;	cJob[0](4)=34*PI/180;	cJob[0](5)=88*PI/180;	cJob[0](6)=73*PI/180;
 
+	cHome[1](0)=0;	cHome[1](1)=-130*PI/180; cHome[1](2)=-134*PI/180;		cHome[1](3)=30*PI/180;	cHome[1](4)=0*PI/180;	cHome[1](5)=40*PI/180;	cHome[1](6)=0*PI/180;
+	cHome[0](0)=0;	cHome[0](1)=-130*PI/180; cHome[0](2)=130*PI/180;		cHome[0](3)=30*PI/180;	cHome[0](4)=0*PI/180;	cHome[0](5)=40*PI/180;	cHome[0](6)=0*PI/180;
 
 	reset_the_bool();
 
@@ -300,7 +304,7 @@ void Bi_manual_scenario::initKinematics(int index)
 		Jacobian_R[index].Jacobian_7[i].resize(3,7);Jacobian_R[index].Jacobian_7[i].setZero();
 	}
 }
-void Bi_manual_scenario::prepare_sovlve_IK(int index)
+void Bi_manual_scenario::prepare_solver_IK(int index)
 {
 	mSKinematicChain[index]->setJoints(JointPos[index].data());
 	mSKinematicChain[index]->getEndPos(Pos_End[index]);
@@ -373,6 +377,14 @@ void Bi_manual_scenario::pubish_on_tf(VectorXd  X,Quaternionf  Q,std::string n)
 	tf_transform.setRotation(tf_q);
 	tf_br->sendTransform(tf::StampedTransform(tf_transform, ros::Time::now(), "world_real", n));
 }
+void Bi_manual_scenario::sendCommand(int _command)
+{
+	std_msgs::Int64 msg;
+
+	msg.data=_command;
+
+	pub_command.publish(msg);
+}
 void Bi_manual_scenario::prepare_jacobian(int index)
 {
 	for	(int i=0;i<7;i++)
@@ -426,6 +438,7 @@ RobotInterface::Status Bi_manual_scenario::RobotInit(){
 	AddConsoleCommand("job");
 	AddConsoleCommand("move");
 	AddConsoleCommand("stop");
+	AddConsoleCommand("home");
 	return STATUS_OK;
 }
 RobotInterface::Status Bi_manual_scenario::RobotFree(){
@@ -474,10 +487,7 @@ RobotInterface::Status Bi_manual_scenario::RobotUpdate(){
 			{
 				initKinematics(i);
 				Desired_JointVel[i].setZero();
-				for(int i=0;i<N_robots;i++)
-				{
-					Send_Velocity_To_Robot(i,Desired_JointVel[i]);
-				}
+				Send_Velocity_To_Robot(i,Desired_JointVel[i]);
 			}
 			cout<<"initKinematics is done"<<endl;
 			IK_Solver->Finalize_Initialization();
@@ -490,11 +500,14 @@ RobotInterface::Status Bi_manual_scenario::RobotUpdate(){
 		{
 			for(int i=0;i<N_robots;i++)
 			{
-				prepare_sovlve_IK(i);
+				prepare_solver_IK(i);
 
 				Desired_DirY[i]=DirY_End[i];
 				Desired_DirZ[i]=DirZ_End[i];
-				Pos_End[i]=Desired_Pos_End[i];
+				Desired_Pos_End[i]=Pos_End[i];
+/*				cout<<"Pos_End "<<i<<endl;cout<<Pos_End[i]<<endl;
+				cout<<"DirY_End "<<i<<endl;cout<<DirY_End[i]<<endl;
+				cout<<"DirZ_End "<<i<<endl;cout<<DirZ_End[i]<<endl;*/
 			}
 			flag_init[1]=true;
 			cout<<"Initialization finished"<<endl;
@@ -507,10 +520,7 @@ RobotInterface::Status Bi_manual_scenario::RobotUpdate(){
 		{
 			initKinematics(i);
 			Desired_JointVel[i].setZero();
-			for(int i=0;i<N_robots;i++)
-			{
-				Send_Velocity_To_Robot(i,Desired_JointVel[i]);
-			}
+			Send_Velocity_To_Robot(i,Desired_JointVel[i]);
 		}
 		mPlanner=PLANNER_NONE;
 		break;
@@ -519,6 +529,18 @@ RobotInterface::Status Bi_manual_scenario::RobotUpdate(){
 		for(int i=0;i<N_robots;i++)
 		{
 			prepare_jacobian(i);
+			cDesired[i]=cJob[i];
+
+			cout<<"Pos_End "<<i<<endl;cout<<Pos_End[i]<<endl;
+		}
+		mPlanner=PLANNER_JOINT;
+		mCommand=COMMAND_NONE;
+		break;
+	case COMMAND_Home:
+		sendCommand(COMMAND_JOB);
+		for(int i=0;i<N_robots;i++)
+		{
+			cDesired[i]=cHome[i];
 
 			cout<<"Pos_End "<<i<<endl;cout<<Pos_End[i]<<endl;
 		}
@@ -544,19 +566,21 @@ RobotInterface::Status Bi_manual_scenario::RobotUpdateCore(){
 
 		for(int i=0;i<N_robots;i++)
 		{
-			prepare_sovlve_IK(i);
+			prepare_solver_IK(i);
 		}
 
 
 		for(int i=0;i<N_robots;i++)
 		{
-			prepare_sovlve_IK(i);
+			prepare_solver_IK(i);
 			IK_Solver->set_jacobian_links(i,Jacobian_R[i]);
 			IK_Solver->set_jacobian(i,Jacobian9[i]);
 
-			Desired_Velocity[i].block(0,0,3,1)=(Desired_Pos_End[i].block(0,0,3,1)-Pos_End[i])/dt;
+			Desired_Velocity[i].block(0,0,3,1)=(Desired_Pos_End[i]-Pos_End[i])/dt;
 			Desired_Velocity[i].block(3,0,3,1)=(Desired_DirY[i]-DirY_End[i])/(10*dt);
 			Desired_Velocity[i].block(6,0,3,1)=(Desired_DirZ[i]-DirZ_End[i])/(10*dt);
+
+
 			IK_Solver->set_desired(i,Desired_Velocity[i]);
 			IK_Solver->set_state(i,JointPos[i],JointVel[i]);
 		}
@@ -568,7 +592,9 @@ RobotInterface::Status Bi_manual_scenario::RobotUpdateCore(){
 		for(int i=0;i<N_robots;i++)
 		{
 			IK_Solver->get_state(i,JointDesVel[i]);
-			Desired_JointVel[i]=JointDesVel[i]*0.004;
+			cout<<"JointDesVel[i] "<<i<<" i "<<JointDesVel[i]<<endl;
+			Desired_JointVel[i].setZero();
+			Desired_JointVel[i]=JointDesVel[i]*0.002;
 			JointVel[i]=Desired_JointVel[i];
 		}
 
@@ -576,9 +602,9 @@ RobotInterface::Status Bi_manual_scenario::RobotUpdateCore(){
 	case PLANNER_JOINT:
 		for(int i=0;i<N_robots;i++)
 		{
-			prepare_sovlve_IK(i);
+			prepare_solver_IK(i);
 			prepare_jacobian(i);
-			Desired_JointVel[i]=0.2*(cJob[i]-JointPos[i]);
+			Desired_JointVel[i]=0.2*(cDesired[i]-JointPos[i]);
 		}
 		break;
 	}
@@ -602,6 +628,11 @@ int Bi_manual_scenario::RespondToConsoleCommand(const string cmd, const vector<s
 	}
 	else if(cmd=="job"){
 		mCommand = COMMAND_JOB;
+		mPlanner=PLANNER_NONE;
+		flag_job=false;
+	}
+	else if(cmd=="home"){
+		mCommand = COMMAND_Home;
 		mPlanner=PLANNER_NONE;
 		flag_job=false;
 	}
