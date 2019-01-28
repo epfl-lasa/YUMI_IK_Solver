@@ -1,0 +1,44 @@
+<?xml version="1.0" ?><package>
+  <name>simulator_dynamics</name>
+  <version>0.0.0</version>
+  <description>The simulator_dynamics package</description>
+
+  <!-- One maintainer tag required, multiple allowed, one person per tag -->
+  <!-- Example:  -->
+  <!-- <maintainer email="jane.doe@example.com">Jane Doe</maintainer> -->
+  <maintainer email="nisommer@todo.todo">nisommer</maintainer>
+
+
+  <!-- One license tag required, multiple allowed, one license per tag -->
+  <!-- Commonly used license strings: -->
+  <!--   BSD, MIT, Boost Software License, GPLv2, GPLv3, LGPLv2.1, LGPLv3 -->
+  <license>TODO</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>rtk_pkg_tools</build_depend>
+  <build_depend>rtk_libbullet</build_depend>
+  <build_depend>mathlib</build_depend>
+  <build_depend>robotlib</build_depend>
+  <build_depend>std_tools</build_depend>
+  <build_depend>udp_network</build_depend>
+  <build_depend>rtk_libode</build_depend>
+  <build_depend>roslib</build_depend>
+
+  <run_depend>rtk_libbullet</run_depend>
+  <run_depend>rtk_pkg_tools</run_depend>
+  <run_depend>mathlib</run_depend>
+  <run_depend>robotlib</run_depend>
+  <run_depend>std_tools</run_depend>
+  <run_depend>udp_network</run_depend>
+  <run_depend>rtk_libode</run_depend>
+  <run_depend>roslib</run_depend>
+
+  <!-- The export tag contains other, unspecified, tags -->
+  <export>
+    <!-- You can specify that this package is a metapackage here: -->
+    <!-- <metapackage/> -->
+
+    <!-- Other tools can request additional information be placed here -->
+
+  </export>
+</package>

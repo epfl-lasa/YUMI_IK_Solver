@@ -19,3 +19,12 @@
 [submodule "miscellaneous/mocap_optitrack"]
 	path = miscellaneous/mocap_optitrack
 	url = git@github.com:epfl-lasa/mocap_optitrack.git
+[submodule "QP_IK_solver"]
+	path = QP_IK_solver
+	url = git@github.com:sinamr66/QP_IK_solver.git
+[submodule "miscellaneous/sg_differentiation"]
+	path = miscellaneous/sg_differentiation
+	url = git@github.com:epfl-lasa/sg_differentiation.git
+[submodule "IK_solver/SVMGrad"]
+	path = IK_solver/SVMGrad
+	url = git@github.com:nbfigueroa/SVMGrad.git
