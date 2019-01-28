@@ -1,3 +1,6 @@
 [submodule "abb"]
 	path = abb
 	url = git@github.com:epfl-lasa/abb.git
+[submodule "industrial_core"]
+	path = industrial_core
+	url = git@github.com:epfl-lasa/industrial_core.git
