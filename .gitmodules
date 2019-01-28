@@ -16,3 +16,6 @@
 [submodule "motion-generators"]
 	path = motion-generators
 	url = git@github.com:epfl-lasa/motion-generators.git
+[submodule "miscellaneous/mocap_optitrack"]
+	path = miscellaneous/mocap_optitrack
+	url = git@github.com:epfl-lasa/mocap_optitrack.git
