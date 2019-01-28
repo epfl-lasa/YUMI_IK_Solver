@@ -419,6 +419,7 @@ RobotInterface::Status Bi_manual_scenario::RobotInit(){
 	AddConsoleCommand("init");
 	AddConsoleCommand("job");
 	AddConsoleCommand("move");
+	AddConsoleCommand("stop");
 	return STATUS_OK;
 }
 RobotInterface::Status Bi_manual_scenario::RobotFree(){
@@ -481,13 +482,25 @@ RobotInterface::Status Bi_manual_scenario::RobotUpdate(){
 		}
 		if (everythingisreceived()&&!flag_init[1])
 		{
-			VectorXd handle;handle.resize(6); handle.setZero();
 			for(int i=0;i<N_robots;i++)
 			{
 				prepare_sovlve_IK(i);
 			}
 			flag_init[1]=true;
 			cout<<"Initialization finished"<<endl;
+		}
+		mPlanner=PLANNER_NONE;
+		break;
+	case COMMAND_STOP:
+		sendCommand(COMMAND_STOP);
+		for (int i=0;i<N_robots;i++)
+		{
+			initKinematics(i);
+			Desired_JointVel[i].setZero();
+			for(int i=0;i<N_robots;i++)
+			{
+				Send_Velocity_To_Robot(i,Desired_JointVel[i]);
+			}
 		}
 		mPlanner=PLANNER_NONE;
 		break;
@@ -580,6 +593,11 @@ int Bi_manual_scenario::RespondToConsoleCommand(const string cmd, const vector<s
 	}
 	else if(cmd=="job"){
 		mCommand = COMMAND_JOB;
+		mPlanner=PLANNER_NONE;
+		flag_job=false;
+	}
+	else if(cmd=="stop"){
+		mCommand = COMMAND_STOP;
 		mPlanner=PLANNER_NONE;
 		flag_job=false;
 	}
