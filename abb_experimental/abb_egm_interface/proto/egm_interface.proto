@@ -1,0 +1,199 @@
+syntax = "proto2";
+
+package abb.egm_interface.proto;
+
+//============================================================================================
+// Auxiliary messages.
+//============================================================================================
+
+//==============================================
+// Joint space related messages
+//==============================================
+
+// Joint space data for robot axes and external axes.
+// I.e. position [degree] and speed [degree/s].
+// Note: acceleration [degree/s^2] is only used for interpolation.
+message JointSpace
+{
+    repeated double position = 1;              // Note: Only up to six values will be considers.
+                                               //       I.e. robot joints 1-6.
+    repeated double speed = 2;                 // Note: Same as previous note.
+    repeated double acceleration = 3;          // Note: Same as previous note. Also, ONLY used as input for spline interpolation. I.e. it is NOT sent to the robot controller.
+    repeated double external_position = 4;     // Note: Only up to six values will be considers.
+                                               //       I.e. 6 external axes [for six axes robots]
+                                               //            OR
+                                               //            robot joint 7 + 5 external axes [for seven axes robot].
+    repeated double external_speed = 5;        // Note: Same as previous note.
+    repeated double external_acceleration = 6; // Note: Same as previous note. Also, ONLY used as input for spline interpolation. I.e. it is NOT sent to the robot controller.
+}
+
+
+//==============================================
+// Cartesian space related messages.
+//
+// Note:
+// Interpreted relative to the sensor frame
+// defined when setting up EGM with RAPID
+// instructions. E.g. EGMActPose instruction.
+//==============================================
+
+// Cartesian position [mm].
+message Cartesian
+{
+    required double x = 1;
+    required double y = 2;
+    required double z = 3;
+}
+
+// Euler angles orientation [degree].
+// Note: Higher priority than quaternions.
+message Euler
+{
+    required double x = 1;
+    required double y = 2;
+    required double z = 3;
+}
+
+// Quaternion orientation [-]
+// Note: Lower priority than Euler angles.
+message Quaternion
+{
+    required double u0 = 1;
+    required double u1 = 2;
+    required double u2 = 3;
+    required double u3 = 4;
+}
+
+// Speed reference values [mm/s and degree/s].
+message CartesianSpeed 
+{
+    repeated double value = 1; // Note: Only up to six values will be considers.
+                               //       Values 1-3: x, y and z velocity [mm/s].
+                               //       Values 4-6: x, y and z angular velocity [degrees/s].
+}
+
+// Acceleration reference values [mm/s^2].
+// Note: ONLY used as input for spline interpolation. I.e. it is NOT sent to the robot controller.
+message CartesianAcceleration 
+{
+    required double x = 1;
+    required double y = 2;
+    required double z = 3;
+}
+
+// Cartesian space data.
+// I.e. Cartesian position [mm], orientation [- or degree] and Cartesian speed [mm/s and degree/s].
+// Note: Cartesian acceleration [mm/s^2] is only used for interpolation.
+message CartesianSpace 
+{ 
+    optional Cartesian             position = 1;
+    optional Euler                 euler_orientation = 2;      // Note: Higher priority than quaternions (if both quaternions and Euler angles are specified).
+    optional Quaternion            quaternion_orientation = 3; // Note: Lower priority than Euler angles (if both quaternions and Euler angles are specified).
+    optional CartesianSpeed        speed = 4;
+    optional CartesianAcceleration acceleration = 5;           // Note: ONLY used as input for spline interpolation. I.e. it is NOT sent to the robot controller.
+} 
+
+
+//==============================================
+// Support messages
+//==============================================
+
+// Planned values (from the robot controller).
+message Planned
+{
+    optional JointSpace     joints = 1;    // Note: The speed component is estimated outside the robot controller.
+    optional CartesianSpace cartesian = 2; // Note: Same as previous note.
+}
+
+// Feedback values (from the robot controller).
+message Feedback
+{
+    optional JointSpace     joints = 1;    // Note: The speed component is estimated outside the robot controller.
+    optional CartesianSpace cartesian = 2; // Note: Same as previous note.
+}
+
+// A point in a trajectory.
+// Note: Either in joint space or Cartesian space.
+//       This depends on the configuration of the EGM interface (i.e. the EGM server application).
+//
+// Examples: Cartesian mode [Only for six axes robots]: Cartesian values (see CartesianSpace) + external axes (see JointSpace).
+//           Joint mode [For both six and seven axes robots]: robot axes (see JointSpace) + external axes (see JointSpace).
+message TrajectoryPoint
+{
+    optional JointSpace     joints = 1;
+    optional CartesianSpace cartesian = 2;
+    optional double         duration = 3;               // Duration [s] it should take to reach the point. 
+    optional bool           fine = 4 [default = false];
+    optional double         angle_condition = 5;        // Note: Used for joint position [degree].
+    optional double         position_condition = 6;     // Note: Used for Cartesian position [mm].
+}
+
+// Motor state.
+message MotorState
+{
+    enum MotorStateType 
+    {
+        MOTORS_UNDEFINED = 0;
+        MOTORS_ON        = 1;
+        MOTORS_OFF       = 2;
+    }
+
+    required MotorStateType state = 1 [default = MOTORS_UNDEFINED];
+}
+
+// EGM state.
+message EgmState
+{
+    enum EGMStateType
+    {
+        EGM_UNDEFINED = 0;
+        EGM_ERROR     = 1;
+        EGM_STOPPED   = 2;
+        EGM_RUNNING   = 3;
+    }
+
+    required EGMStateType state = 1 [default = EGM_UNDEFINED];
+}
+
+// RAPID execution state.
+message RapidExecState
+{
+    enum RapidCtrlStateType
+    {
+        RAPID_UNDEFINED = 0;
+        RAPID_STOPPED   = 1;
+        RAPID_RUNNING   = 2;
+    };
+
+    required RapidCtrlStateType state = 1 [default = RAPID_UNDEFINED];
+}
+
+// Robot status.
+message RobotStatus
+{
+    required MotorState motor = 1;
+    required EgmState egm = 2;
+    required RapidExecState rapid_execution = 3;
+}
+
+
+
+
+//============================================================================================
+// Primary messages
+//============================================================================================
+
+// A trajectory that the external EGM interface (i.e. the EGM server application) should follow.
+message Trajectory
+{
+    repeated TrajectoryPoint points = 1;
+}
+
+// Data collected by the external EGM interface (i.e. the EGM server application).
+message InterfaceData
+{
+    optional Feedback    feedback = 1;
+    optional Planned     planned = 2;
+    optional Trajectory  currently_planned_trajectory = 3;
+    optional RobotStatus robot_status = 4;
+}

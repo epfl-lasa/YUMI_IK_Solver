@@ -1,0 +1,179 @@
+<?xml version="1.0" ?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <xacro:macro name="material_grey">
+    <material name="gray">
+      <color rgba="0.5 0.5 0.5 1.0"/>
+    </material>
+  </xacro:macro> 
+  <xacro:property name="PI" value="3.14159265358979"/>
+  <xacro:macro name="calculate_limit" params="lower upper effort velocity">
+	  <limit lower="${lower*PI/180.0}" upper="${upper*PI/180.0}" effort="${effort}" velocity="${velocity*PI/180.0}"/>
+  </xacro:macro>
+  
+  <xacro:macro name="abb_irb1600x145" params="prefix">
+    <!-- links -->
+    <link name="${prefix}base_link">
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+	        <mesh filename="package://abb_irb1600_support/meshes/irb1600x145/visual/base_link.dae"/>
+        </geometry>
+        <xacro:material_grey/>
+      </visual>
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+	        <mesh filename="package://abb_irb1600_support/meshes/irb1600x145/collision/base_link.stl"/>
+        </geometry>
+      </collision>
+    </link>
+    <link name="${prefix}link_1">
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+	        <mesh filename="package://abb_irb1600_support/meshes/irb1600x145/visual/link_1.dae"/>
+        </geometry>
+        <xacro:material_grey/>
+      </visual>
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+	        <mesh filename="package://abb_irb1600_support/meshes/irb1600x145/collision/link_1.stl"/>
+        </geometry>
+      </collision>
+    </link>
+    <link name="${prefix}link_2">
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+	        <mesh filename="package://abb_irb1600_support/meshes/irb1600x145/visual/link_2.dae"/>
+        </geometry>
+        <xacro:material_grey/>
+      </visual>
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+	        <mesh filename="package://abb_irb1600_support/meshes/irb1600x145/collision/link_2.stl"/>
+        </geometry>
+      </collision>
+    </link>
+    <link name="${prefix}link_3">
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+	        <mesh filename="package://abb_irb1600_support/meshes/irb1600x145/visual/link_3.dae"/>
+        </geometry>
+        <xacro:material_grey/>
+      </visual>
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+	        <mesh filename="package://abb_irb1600_support/meshes/irb1600x145/collision/link_3.stl"/>
+        </geometry>
+      </collision>
+    </link>
+    <link name="${prefix}link_4">
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+	        <mesh filename="package://abb_irb1600_support/meshes/irb1600x145/visual/link_4.dae"/>
+        </geometry>
+        <xacro:material_grey/>
+      </visual>
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+	        <mesh filename="package://abb_irb1600_support/meshes/irb1600x145/collision/link_4.stl"/>
+        </geometry>
+      </collision>
+    </link>
+    <link name="${prefix}link_5">
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+	        <mesh filename="package://abb_irb1600_support/meshes/irb1600x145/visual/link_5.dae"/>
+        </geometry>
+        <xacro:material_grey/>
+      </visual>
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+	        <mesh filename="package://abb_irb1600_support/meshes/irb1600x145/collision/link_5.stl"/>
+        </geometry>
+      </collision>
+    </link>
+    <link name="${prefix}link_6">
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+	        <mesh filename="package://abb_irb1600_support/meshes/irb1600x145/visual/link_6.dae"/>
+        </geometry>
+        <xacro:material_grey/>
+      </visual>
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+	        <mesh filename="package://abb_irb1600_support/meshes/irb1600x145/collision/link_6.stl"/>
+        </geometry>
+      </collision>
+    </link>
+    <link name="${prefix}tool0"/>
+    
+    <!-- joints -->
+    <joint name="${prefix}joint_1" type="revolute">
+      <origin xyz="0 0 0.1245" rpy="0 0 0"/>
+	    <parent link="${prefix}base_link"/>
+	    <child link="${prefix}link_1"/>
+      <axis xyz="0 0 1"/>             
+	    <xacro:calculate_limit lower="-180.0" upper="180.0" effort="0.0" velocity="180.0"/>
+    </joint>
+    <joint name="${prefix}joint_2" type="revolute">
+      <origin xyz="0.150 -0.138 0.362" rpy="0 0 0"/>
+	    <parent link="${prefix}link_1"/>
+	    <child link="${prefix}link_2"/>
+      <axis xyz="0 1 0"/>             
+	    <xacro:calculate_limit lower="-90.0" upper="150.0" effort="0.0" velocity="180.0"/>
+    </joint>
+    <joint name="${prefix}joint_3" type="revolute">
+      <origin xyz="0 0.031 0.7" rpy="0 0 0"/>
+	    <parent link="${prefix}link_2"/>
+	    <child link="${prefix}link_3"/>
+      <axis xyz="0 1 0"/>             
+	    <xacro:calculate_limit lower="-245.0" upper="65.0" effort="0.0" velocity="185.0"/>
+    </joint>
+    <joint name="${prefix}joint_4" type="revolute">
+      <origin xyz="0.314 0.107 0" rpy="0 0 0"/>
+	    <parent link="${prefix}link_3"/>
+	    <child link="${prefix}link_4"/>
+      <axis xyz="1 0 0"/>             
+	    <xacro:calculate_limit lower="-200.0" upper="200.0" effort="0.0" velocity="385.0"/>
+    </joint> 
+    <joint name="${prefix}joint_5" type="revolute">
+      <origin xyz="0.285 -0.0155 0" rpy="0 0 0"/>
+	    <parent link="${prefix}link_4"/>
+	    <child link="${prefix}link_5"/>
+      <axis xyz="0 1 0"/>             
+	    <xacro:calculate_limit lower="-115.0" upper="115.0" effort="0.0" velocity="400.0"/>
+    </joint>   
+    <joint name="${prefix}joint_6" type="revolute">
+      <origin xyz="0.065 0.0155 0" rpy="0 0 0"/>
+	    <parent link="${prefix}link_5"/>
+	    <child link="${prefix}link_6"/>
+      <axis xyz="1 0 0"/>             
+	    <xacro:calculate_limit lower="-400.0" upper="400.0" effort="0.0" velocity="460.0"/>
+    </joint>
+    <joint name="${prefix}joint_6-tool0" type="fixed">
+      <origin xyz="0 0 0" rpy="0 ${90.0*PI/180.0} 0"/>
+	    <parent link="${prefix}link_6"/>
+	    <child link="${prefix}tool0"/>
+    </joint>
+    
+    <!-- ROS base_link to ABB World Coordinates transform -->
+    <link name="${prefix}base"/>
+    <joint name="${prefix}base_link-base" type="fixed">
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <parent link="${prefix}base_link"/>
+	    <child link="${prefix}base"/>
+    </joint>
+  </xacro:macro>
+</robot>

@@ -1,0 +1,27 @@
+<!--
+  Manipulator specific version of abb_driver's 'robot_interface.launch'.
+
+  Defaults provided for IRB 1600-x/1.45:
+   - J23_coupled = false
+   - use_egm = false
+
+  Usage:
+    robot_interface_download_irb1600x145.launch robot_ip:=<value>
+-->
+<launch>
+  <arg name="robot_ip" />
+  <arg name="J23_coupled" default="false" />
+  <arg name="use_egm" default="false" />
+
+  <rosparam command="load" file="$(find abb_irb1600_support)/config/joint_names_irb1600x145.yaml" />
+
+  <include file="$(find abb_driver)/launch/robot_interface.launch" unless="$(arg use_egm)">
+    <arg name="robot_ip"    value="$(arg robot_ip)" />
+    <arg name="J23_coupled" value="$(arg J23_coupled)" />
+  </include>
+  
+  <include file="$(find abb_egm_driver)/launch/robot_interface.launch" if="$(arg use_egm)">
+    <arg name="robot_ip"    value="$(arg robot_ip)" />
+    <arg name="J23_coupled" value="$(arg J23_coupled)" />
+  </include>
+</launch>
