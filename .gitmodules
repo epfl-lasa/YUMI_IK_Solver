@@ -4,3 +4,6 @@
 [submodule "industrial_core"]
 	path = industrial_core
 	url = git@github.com:epfl-lasa/industrial_core.git
+[submodule "yumi-1"]
+	path = yumi-1
+	url = git@github.com:epfl-lasa/yumi-1.git
