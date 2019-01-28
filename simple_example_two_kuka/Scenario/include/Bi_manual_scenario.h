@@ -83,7 +83,7 @@ private :
 	void 						sendCommand(int _command);
 	void						reset_the_bool();
 	bool						everythingisreceived();
-	void						pubish_on_tf(VectorXd  X,Quaterniond  Q,std::string n);
+	void						pubish_on_tf(VectorXd  X,Quaternionf  Q,std::string n);
 	void						prepare_jacobian(int index);
 
 
@@ -124,10 +124,10 @@ private :
 
 	Matrix4d					T0[N_robots];
 
-	Vector3d					lDirX[N_robots];
-	Vector3d					lDirY[N_robots];
-	Vector3d					lDirZ[N_robots];
-	Vector3d					RPos_End[N_robots];
+	Vector3d					DirX_End[N_robots];
+	Vector3d					DirY_End[N_robots];
+	Vector3d					DirZ_End[N_robots];
+	Vector3d					Pos_End[N_robots];
 
 	Eigen::Quaternionf 			rotation_right_temp;
 	Eigen::Matrix3f 			rot_mat_right_temp;
@@ -169,6 +169,16 @@ private :
 	int 						ret_code;*/
 };
 
+string addTwostring(string string1, string string2, int integer1)
+{
+	std::string str;
+	str.append(string1);
+	str.append(string2);
+	ostringstream convert;
+	convert << integer1;
+	str.append(convert.str());
+	return str;
+}
 
 
 #endif 

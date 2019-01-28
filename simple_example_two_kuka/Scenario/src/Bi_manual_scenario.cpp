@@ -32,6 +32,8 @@ void Bi_manual_scenario::chatterCallback_Desired_end_right(const geometry_msgs::
 	Desired_DirY[1](0)=rot_mat_right_temp(0,1); Desired_DirZ[1](0)=rot_mat_right_temp(0,2);
 	Desired_DirY[1](1)=rot_mat_right_temp(1,1);	Desired_DirZ[1](1)=rot_mat_right_temp(1,2);
 	Desired_DirY[1](2)=rot_mat_right_temp(2,1);	Desired_DirZ[1](2)=rot_mat_right_temp(2,2);
+
+	pubish_on_tf(Desired_Pos_End[1],rotation_right_temp, addTwostring("End","Real_end",1));
 }
 
 void Bi_manual_scenario::chatterCallback_Desired_end_left(const geometry_msgs::Pose & msg)
@@ -47,6 +49,8 @@ void Bi_manual_scenario::chatterCallback_Desired_end_left(const geometry_msgs::P
 	Desired_DirY[0](0)=rot_mat_left_temp(0,1);	Desired_DirZ[0](0)=rot_mat_left_temp(0,2);
 	Desired_DirY[0](1)=rot_mat_left_temp(1,1);	Desired_DirZ[0](1)=rot_mat_left_temp(1,2);
 	Desired_DirY[0](2)=rot_mat_left_temp(2,1);	Desired_DirZ[0](2)=rot_mat_left_temp(2,2);
+
+	pubish_on_tf(Desired_Pos_End[0],rotation_left_temp, addTwostring("End","Real_end",0));
 
 }
 
@@ -279,15 +283,15 @@ void Bi_manual_scenario::initKinematics(int index)
 	Jacobian9[index].resize(9,KUKA_DOF);
 
 	/*	inp.resize(3);					outp.resize(3);*/
-	RPos_End[index].setZero();
+	Pos_End[index].setZero();
 	/*
 	filter_pos_robot[index]= new SGF::SavitzkyGolayFilter(3,order, winlen, sample_time);*/
 
 	mSKinematicChain[index]->setJoints(JointPos[index].data());
-	mSKinematicChain[index]->getEndPos(RPos_End[index]);
-	msg_robot_end.position.x=RPos_End[index](0);
-	msg_robot_end.position.y=RPos_End[index](1);
-	msg_robot_end.position.z=RPos_End[index](2);
+	mSKinematicChain[index]->getEndPos(Pos_End[index]);
+	msg_robot_end.position.x=Pos_End[index](0);
+	msg_robot_end.position.y=Pos_End[index](1);
+	msg_robot_end.position.z=Pos_End[index](2);
 	pub_end_of_robot[index].publish(msg_robot_end);
 
 	for (int i=0;i<7;i++)
@@ -299,20 +303,20 @@ void Bi_manual_scenario::initKinematics(int index)
 void Bi_manual_scenario::prepare_sovlve_IK(int index)
 {
 	mSKinematicChain[index]->setJoints(JointPos[index].data());
-	mSKinematicChain[index]->getEndPos(RPos_End[index]);
-	mSKinematicChain[index]->getEndDirAxis(AXIS_X, lDirX[index]);
-	mSKinematicChain[index]->getEndDirAxis(AXIS_Y, lDirY[index]);
-	mSKinematicChain[index]->getEndDirAxis(AXIS_Z, lDirZ[index]);
+	mSKinematicChain[index]->getEndPos(Pos_End[index]);
+	mSKinematicChain[index]->getEndDirAxis(AXIS_X, DirX_End[index]);
+	mSKinematicChain[index]->getEndDirAxis(AXIS_Y, DirY_End[index]);
+	mSKinematicChain[index]->getEndDirAxis(AXIS_Z, DirZ_End[index]);
 
-	msg_robot_end.position.x=RPos_End[index](0);
-	msg_robot_end.position.y=RPos_End[index](1);
-	msg_robot_end.position.z=RPos_End[index](2);
+	msg_robot_end.position.x=Pos_End[index](0);
+	msg_robot_end.position.y=Pos_End[index](1);
+	msg_robot_end.position.z=Pos_End[index](2);
 
 
 
-	rot_mat_temp(0,0)=lDirX[index](0); 	rot_mat_temp(0,1)=lDirY[index](0); 	rot_mat_temp(0,2)=lDirZ[index](0);
-	rot_mat_temp(1,0)=lDirX[index](1); 	rot_mat_temp(1,1)=lDirY[index](1); 	rot_mat_temp(1,2)=lDirZ[index](1);
-	rot_mat_temp(2,0)=lDirX[index](2);	rot_mat_temp(2,1)=lDirY[index](2);	rot_mat_temp(2,2)=lDirZ[index](2);
+	rot_mat_temp(0,0)=DirX_End[index](0); 	rot_mat_temp(0,1)=DirY_End[index](0); 	rot_mat_temp(0,2)=DirZ_End[index](0);
+	rot_mat_temp(1,0)=DirX_End[index](1); 	rot_mat_temp(1,1)=DirY_End[index](1); 	rot_mat_temp(1,2)=DirZ_End[index](1);
+	rot_mat_temp(2,0)=DirX_End[index](2);	rot_mat_temp(2,1)=DirY_End[index](2);	rot_mat_temp(2,2)=DirZ_End[index](2);
 
 	Eigen::Quaternionf rotation_temp(rot_mat_temp);
 
@@ -322,6 +326,8 @@ void Bi_manual_scenario::prepare_sovlve_IK(int index)
 	msg_robot_end.orientation.z=rotation_temp.z();
 
 	pub_end_of_robot[index].publish(msg_robot_end);
+
+	pubish_on_tf(Pos_End[index],rotation_temp, addTwostring("End","Real_end",index));
 
 	prepare_jacobian(index);
 
@@ -360,7 +366,7 @@ bool Bi_manual_scenario::everythingisreceived()
 
 	return flag;
 }
-void Bi_manual_scenario::pubish_on_tf(VectorXd  X,Quaterniond  Q,std::string n)
+void Bi_manual_scenario::pubish_on_tf(VectorXd  X,Quaternionf  Q,std::string n)
 {
 	tf_transform.setOrigin( tf::Vector3(X(0),X(1), X(2)) );
 	tf_q.setX(Q.x());tf_q.setY(Q.y());tf_q.setZ(Q.z());tf_q.setW(Q.w());
@@ -485,6 +491,10 @@ RobotInterface::Status Bi_manual_scenario::RobotUpdate(){
 			for(int i=0;i<N_robots;i++)
 			{
 				prepare_sovlve_IK(i);
+
+				Desired_DirY[i]=DirY_End[i];
+				Desired_DirZ[i]=DirZ_End[i];
+				Pos_End[i]=Desired_Pos_End[i];
 			}
 			flag_init[1]=true;
 			cout<<"Initialization finished"<<endl;
@@ -510,7 +520,7 @@ RobotInterface::Status Bi_manual_scenario::RobotUpdate(){
 		{
 			prepare_jacobian(i);
 
-			cout<<"RPos_End "<<i<<endl;cout<<RPos_End[i]<<endl;
+			cout<<"Pos_End "<<i<<endl;cout<<Pos_End[i]<<endl;
 		}
 		mPlanner=PLANNER_JOINT;
 		mCommand=COMMAND_NONE;
@@ -535,7 +545,6 @@ RobotInterface::Status Bi_manual_scenario::RobotUpdateCore(){
 		for(int i=0;i<N_robots;i++)
 		{
 			prepare_sovlve_IK(i);
-			// For closed loop
 		}
 
 
@@ -545,9 +554,9 @@ RobotInterface::Status Bi_manual_scenario::RobotUpdateCore(){
 			IK_Solver->set_jacobian_links(i,Jacobian_R[i]);
 			IK_Solver->set_jacobian(i,Jacobian9[i]);
 
-			Desired_Velocity[i].block(0,0,3,1)=(Desired_Pos_End[i].block(0,0,3,1)-RPos_End[i])/dt;
-			Desired_Velocity[i].block(3,0,3,1)=(Desired_DirY[i]-lDirY[i])/(10*dt);
-			Desired_Velocity[i].block(6,0,3,1)=(Desired_DirZ[i]-lDirZ[i])/(10*dt);
+			Desired_Velocity[i].block(0,0,3,1)=(Desired_Pos_End[i].block(0,0,3,1)-Pos_End[i])/dt;
+			Desired_Velocity[i].block(3,0,3,1)=(Desired_DirY[i]-DirY_End[i])/(10*dt);
+			Desired_Velocity[i].block(6,0,3,1)=(Desired_DirZ[i]-DirZ_End[i])/(10*dt);
 			IK_Solver->set_desired(i,Desired_Velocity[i]);
 			IK_Solver->set_state(i,JointPos[i],JointVel[i]);
 		}
