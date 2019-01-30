@@ -17,9 +17,11 @@ Note: Make sure that you have set-up the ssh option for github on your PC!
 - Joint space velocity level controller. 
 - End-effector Pos/Orientation interface
 
-# How to set-up the package
+# How to set-up the Robot
 
-Note: You need to have set-up the Rapid EGM modules on Yumi. Follow this https://github.com/kth-ros-pkg/yumi/wiki. EGM modules are not available on-line and one needs to buy the license from ABB. 
+Note: You need to have set-up the Rapid EGM modules on Yumi. Follow this https://github.com/kth-ros-pkg/yumi/wiki. EGM modules are not available on-line and one needs to buy the license from ABB. If you are struggling with this, you can ask [Bernardo Fichera](http://lasa.epfl.ch/people/member.php?SCIPER=292897)
+
+# How to set-up the packge
 
 ## Installation
 1. clone repository 
